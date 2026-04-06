@@ -66,7 +66,7 @@ Camtasia Editor must be installed if you want to see the results and actually ex
     * As another option, given that there are actually no dependencies or build steps, you can also run the script directly with NodeJS if you have it installed:
 
         ```bash
-        node src/episode-injector.js
+        $ node src/episode-injector.js
         ```
     <img src="./docs/images/script-run-1.png" alt="Terminal running the script (part 1)" width="600"/>
     <img src="./docs/images/script-run-2.png" alt="Terminal running the script (part 2)" width="600"/>
