@@ -34,6 +34,14 @@ Camtasia Editor must be installed if you want to see the results and actually ex
 
 # How to use it
 
+> [!IMPORTANT]
+> This repository uses [Git LFS](https://git-lfs.github.com) to manage large media files. When cloning, ensure Git LFS is installed:
+> ```bash
+> git lfs install
+> git clone <repository-url>
+> ```
+> If cloning with the dev container, Git LFS will be installed automatically.
+
 1. Open the `episode.cmproj` file in Camtasia Editor and add the host and guest's content. 
 
     <img src="./docs/images/camtasia-before.png" alt="Camtasia Editor before running the script" width="600"/>

@@ -17,7 +17,8 @@
 				"Compulim.vscode-clock"
 			]
 		}
-	}
+	},
+	"postCreateCommand": "apt-get update && apt-get install -y git-lfs && git lfs install"
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
