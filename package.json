@@ -1,0 +1,12 @@
+{
+  "name": "mtr-overlay-injector",
+  "version": "1.0.0",
+  "description": "This package provides a script to inject the MTR overlays (callouts and other media) into the Camtasia episode project file.",
+  "scripts": {
+    "inject": "node src/episode-injector.js episode.cmproj/project.tscproj"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.31.0"
+}

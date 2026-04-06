@@ -1,0 +1,122 @@
+{
+    "code":  " \nuniform vec4 _BackgroundColor0;\nuniform vec4 _BackgroundColor1;\nuniform float _Opacity;\nuniform vec4 _StarColor0;\nuniform vec4 _StarColor1;\nuniform vec2 _Pos;\nuniform float _Speed;\nuniform float _Panning;\nuniform float _StarDensity;\nuniform float _BokehDensity;\nuniform float _StarSize;\nuniform float _BokehSize;\nuniform float _BokehBrightness;\n\n\n// from textoffset.glsl\nvec2 hash2( vec2 p )\n{\n    return fract(sin(vec2(dot(p,vec2(128.1,313.7)),dot(p,vec2(269.5,183.3))))*43758.5453);\n}\n\nmat2 rot( float a ) { return mat2( cos(a), sin(-a), sin(a), cos(a) ); }\n\n\nvoid getCellInfo( vec2 uv, int z, out vec2 local_uv, out vec2 hash )\n{\n    uv *= rot( float( z ) );\n    uv += 1.;\n    vec2 cell_pos = round(uv/2.);\n    local_uv = uv - cell_pos*2.;\n    hash = hash2( cell_pos + 1. + float(z)*.1 );\n}\n\nfloat starColor( vec2 uv, vec2 hash )\n{\n    bool on = hash.x \u003c .05 * pow( 2., _StarDensity );\n    if ( !on )\n        return 0.;\n    //return smoothstep( 1., .2, length( uv ) );\n    return smoothstep( .01, 20., _StarSize/length( uv ) ) * 2.;\n}\n\nfloat bokehColor( vec2 uv, vec2 hash )\n{\n    bool on = hash.x \u003c .05 * pow( 2., _BokehDensity );\n    if ( !on )\n        return 0.;\n    //return smoothstep( 1., .2, length( local_uv ) );\n    return smoothstep( 1./5., .5/5., length( uv ) ) * _BokehBrightness;\n}\n\nvec4 addCol( vec4 col, vec4 newCol, float opacity )\n{\n    return col + newCol * opacity;\n    //return col + (1.-col) * ( newCol * opacity );\n}\n\nvoid main( void )\n{    \n    vec2 pos = vec2(_TexCoord.x, 1.-_TexCoord.y) * _ImageSize;\n\tpos += _ImageSize * .5 - _Pos;\n    vec2 uv = (pos*2.-_ImageSize.xy)/_ImageSize.y;\n    vec4 backgroundCol = mix( _BackgroundColor0, _BackgroundColor1, smoothstep( 0., 1.8, length( uv ) ) );\n    \n    uv *= 10.;\n    \n    vec4 col = backgroundCol * _Opacity;\n    \n    float t = _Time * pow( 2., _Speed ) * .2;\n    float myZ = t * 5.;\n    vec2 myXY = rot( t * .4 ) * vec2( _Panning, 0. );\n    \n    for ( int i = 99; i \u003e= 0; i-- )\n    {       \n        int starZ = int( ceil( myZ ) ) + i + 0;\n        float distZ = float( starZ ) - myZ;\n        float scale = distZ * .1;\n        {\n            vec2 local_uv;\n            vec2 cellHash;\n            getCellInfo( (uv - myXY) * scale, starZ, local_uv, cellHash );\n            float brightness = starColor( local_uv, cellHash );\n            col = addCol( col, brightness * mix( _StarColor0, _StarColor1, cellHash.y ), pow( .97, distZ ) * .7 );\n            \n        }\n        {\n            vec2 local_uv;\n            vec2 cellHash;\n            getCellInfo( (uv - myXY) * scale / _BokehSize, starZ, local_uv, cellHash );\n            float brightness = bokehColor( local_uv, cellHash );\n            col = addCol( col, brightness * mix( _StarColor0, _StarColor1, cellHash.y ), pow( .97, distZ ) * .7 );\n        }\n    }\n    \n        \n    _FragColor = col;\n}\n",
+    "effectDef":  [
+                      {
+                          "name":  "BackgroundColor0",
+                          "type":  "Color",
+                          "value":  "e9e9e9"
+                      },
+                      {
+                          "name":  "BackgroundColor1",
+                          "type":  "Color",
+                          "value":  "B8BEDD"
+                      },
+                      {
+                          "name":  "Opacity",
+                          "type":  "double",
+                          "unitType":  "percentage",
+                          "valueBounds":  {
+                                              "defaultValue":  1.0,
+                                              "maxValue":  1.0,
+                                              "minValue":  0.0
+                                          }
+                      },
+                      {
+                          "name":  "StarColor0",
+                          "type":  "Color",
+                          "value":  "ffffff"
+                      },
+                      {
+                          "name":  "StarColor1",
+                          "type":  "Color",
+                          "value":  "ffffff"
+                      },
+                      {
+                          "name":  "Pos",
+                          "type":  "Position",
+                          "value":  [
+                                        960,
+                                        540
+                                    ]
+                      },
+                      {
+                          "name":  "Speed",
+                          "type":  "double",
+                          "value":  "1",
+                          "valueBounds":  {
+                                              "defaultValue":  0.0,
+                                              "maxValue":  10,
+                                              "minValue":  -3
+                                          }
+                      },
+                      {
+                          "name":  "Panning",
+                          "type":  "double",
+                          "value":  "1",
+                          "valueBounds":  {
+                                              "defaultValue":  0,
+                                              "maxValue":  50,
+                                              "minValue":  0
+                                          }
+                      },
+                      {
+                          "name":  "StarSize",
+                          "type":  "double",
+                          "value":  "1",
+                          "valueBounds":  {
+                                              "defaultValue":  0.29999999999999999,
+                                              "maxValue":  1,
+                                              "minValue":  0.10000000000000001
+                                          }
+                      },
+                      {
+                          "name":  "StarDensity",
+                          "type":  "double",
+                          "value":  "1",
+                          "valueBounds":  {
+                                              "defaultValue":  0.0,
+                                              "maxValue":  4,
+                                              "minValue":  -5
+                                          }
+                      },
+                      {
+                          "name":  "BokehSize",
+                          "type":  "double",
+                          "value":  "1",
+                          "valueBounds":  {
+                                              "defaultValue":  10,
+                                              "maxValue":  100,
+                                              "minValue":  1
+                                          }
+                      },
+                      {
+                          "name":  "BokehDensity",
+                          "type":  "double",
+                          "value":  "1",
+                          "valueBounds":  {
+                                              "defaultValue":  0.0,
+                                              "maxValue":  3,
+                                              "minValue":  -5
+                                          }
+                      },
+                      {
+                          "name":  "BokehBrightness",
+                          "type":  "double",
+                          "unitType":  "percentage",
+                          "valueBounds":  {
+                                              "defaultValue":  0.20000000000000001,
+                                              "maxValue":  1.0,
+                                              "minValue":  0.0
+                                          }
+                      }
+                  ],
+    "height":  1080,
+    "name":  "Stars",
+    "signature":  {
+                      "type":  "ES512",
+                      "value":  "MIGIAkIBW0xNTGyKF8OoJfFZKL6xod8mRdPAFoynIwtiKbVZ1KbEpiVf+v4f0xNqsSS/dcHAb92lY00+nt712E9NgivNXcUCQgEnGrnTaPzTVlqvxYCo/84xZkPrmm8NPzOE1HptlURHDiMV/cs0gbA4jM8YQR5sk3pm/vQFG+ap4KU9PqNziN54+w=="
+                  },
+    "version":  1.0,
+    "width":  1920,
+    "copyright":  "Copyright © 2023 TechSmith Corporation. All rights reserved."
+}
